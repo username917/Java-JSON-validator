@@ -1,0 +1,81 @@
+package parsingJSON;
+
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class functionsClass extends JSONTextCompare {
+	
+
+	
+	public boolean validate_JSON_text(String JSONcontent, Results obj) {
+		
+		boolean valid = false;
+		
+		try {
+			
+			
+		
+			ObjectMapper objMapper = new ObjectMapper();
+			JsonNode validation = objMapper.readTree(JSONcontent);
+			
+			valid = true;
+		
+		}
+		
+		catch (JsonParseException jpe){
+			
+			String x = jpe.getMessage();
+			printTextArea(x, obj);
+			//return part_3;
+			
+		}
+		catch (IOException ioe) {
+			String x = ioe.getMessage();
+			printTextArea(x, obj);
+			//return part_3;
+		}
+		
+ 		return valid;
+		
+		
+	}
+	public  void printTextArea(String x, Results obj) {
+		// TODO Auto-generated method stub
+		System.out.println(x);
+		String err = x.substring(x.lastIndexOf("\n"));
+		
+		String parts[] = err.split(";");
+		//String part 1 is the discarded leading edge that is the closing brackets of the JSON content
+		String part_2 = parts[1];
+		
+		//split again to get rid of the closing square bracket
+		String parts2[] = part_2.split("]");
+		String part_3 = parts2[0];
+		
+		//JSONTextCompare feedback = new JSONTextCompare();
+		
+		//split the output to get the exact location of the error to communicate back and highlight it in the JSONTextCompare class
+		
+		//first need to get the line number from the output
+		String[] parts_lineNum = part_3.split("line: ");
+		String[] parts_lineNum_final = parts_lineNum[1].split(", column:");
+		String lineNum = parts_lineNum_final[0];
+		String[] parts_caret = part_3.split("column: ");
+		String caret = parts_caret[1];
+		
+		System.out.println(caret);
+		
+		obj.setLineNum(lineNum);
+		obj.setCaret(caret);
+		obj.setResult(part_3);
+		System.out.println(part_3);
+		
+		
+		
+		
+	}
+
+}
