@@ -1,0 +1,247 @@
+package parsingJSON;
+
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+
+import javax.swing.SwingConstants;
+
+import java.awt.BorderLayout;
+
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Iterator;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class MainClassJSONValidator {
+	private static JTextField txtFilePath;
+	private static JTextField txtError;
+	
+	
+	public static void main(final String[] args) {
+		final JFrame f = new JFrame("A JFrame");
+		
+
+		     f.setSize(436, 249);
+		     f.setLocation(300,200);
+		     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		     f.getContentPane().setLayout(null);
+		     
+		     JButton btnNewButton = new JButton("New button");
+		     f.getContentPane().add(btnNewButton, BorderLayout.WEST);
+		     
+		     JButton cmdLoadJSON = new JButton("Get a JSON File...");
+		     cmdLoadJSON.addActionListener(new ActionListener() {
+		     	public void actionPerformed(ActionEvent e) {
+		     		
+		     		//the button redirects to its relevant method
+		     		try {
+						get_JSON_file(f);
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+		     		
+		     	}
+
+				
+		     });
+		     cmdLoadJSON.setBounds(25, 10, 158, 21);
+		     f.getContentPane().add(cmdLoadJSON);
+		     
+		     JButton cmdQuit = new JButton("Quit");
+		     cmdQuit.addActionListener(new ActionListener() {
+		     	public void actionPerformed(ActionEvent e) {
+		     		System.exit(0);
+		     	}
+		     });
+		     cmdQuit.setBounds(257, 10, 132, 21);
+		     f.getContentPane().add(cmdQuit);
+		     
+		     
+		     
+		     JButton btnCheckFile = new JButton("Check File...");
+		     
+		     btnCheckFile.addActionListener(new ActionListener() {
+		     	public void actionPerformed(ActionEvent e) {
+		     		
+		     		try {
+						check_JSON_validity();
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.getMessage();
+						txtError.setText("You must select a JSON file first!");
+						//e1.printStackTrace();
+					}
+		     	}
+		     });
+		     btnCheckFile.setBounds(129, 97, 158, 21);
+		     f.getContentPane().add(btnCheckFile);
+		     
+		     JLabel lblNewLabel = new JLabel("You've loaded this file:");
+		     lblNewLabel.setBounds(25, 41, 125, 21);
+		     f.getContentPane().add(lblNewLabel);
+		     
+		     txtFilePath = new JTextField();
+		     txtFilePath.setBounds(25, 67, 364, 20);
+		     f.getContentPane().add(txtFilePath);
+		     txtFilePath.setColumns(10);
+		     
+		     txtError = new JTextField();
+		     txtError.setHorizontalAlignment(SwingConstants.LEFT);
+		     txtError.setBounds(25, 128, 364, 34);
+		     f.getContentPane().add(txtError);
+		     txtError.setColumns(10);
+		     
+		     JButton cmdTextComparison = new JButton("Check JSON via Text...");
+		     cmdTextComparison.addActionListener(new ActionListener() {
+		     	public void actionPerformed(ActionEvent e) {
+		     		
+		     		//this button is used to launch the next window that will have the ability to compare a JSON text.
+		     		JSON_text_compare();
+		     	}
+
+				private void JSON_text_compare() {
+					
+					//launching the main method for the Text Compare option of the program
+					JSONTextCompare.main(args);
+
+				}
+		     });
+		     cmdTextComparison.setBounds(200, 180, 189, 21);
+		     f.getContentPane().add(cmdTextComparison);
+		     
+		     f.setVisible(true);
+
+    }
+	
+	private static void get_JSON_file(JFrame f) throws Exception {
+		// TODO Auto-generated method stub
+		
+		//this method is going to get the JSON file from a dialog
+		
+		JFileChooser fileChooser = new JFileChooser();
+		//fileChooser.setCurrentDirectory(new File(System.getProperty("C:\\Users\\givanov\\Downloads")));
+		
+		int result = fileChooser.showOpenDialog(f);
+		
+		if (result == JFileChooser.APPROVE_OPTION) {
+		    // user selects a file
+			File selectedFile = fileChooser.getSelectedFile();
+			
+			String fpath = selectedFile.getPath();
+			
+			txtFilePath.setText(fpath);
+			
+		} 
+		
+	}
+
+	private static boolean check_JSON_validity() throws Exception {
+		// TODO Auto-generated method stub
+		//this code is going to check the validity of the JSON file
+		boolean valid = false;
+		
+		String fpath = txtFilePath.getText();
+		System.out.println(fpath);
+		
+		try {
+		String json = readFileAsString(fpath);
+		
+		//final JsonParser validation = new ObjectMapper().getJsonFactory().createJsonParser(json);
+		
+		ObjectMapper objMapper = new ObjectMapper();
+		JsonNode validation = objMapper.readTree(json);
+		
+		valid = true;
+		
+		txtError.setText("JSON file is valid!");
+		
+		//process_file(fpath); //connects to a method that can parse the content of the JSON and print it out, but is not needed - yet.
+		
+		}
+		
+		catch (JsonParseException jpe){
+			
+			String x = jpe.getMessage();
+			printTextArea(x);
+			
+		}
+		catch (IOException ioe) {
+			String x = ioe.getMessage();
+			printTextArea(x);
+		}
+		
+		return valid;
+		
+	}
+
+	private static void printTextArea(String x) {
+		// TODO Auto-generated method stub
+		String err = x.substring(x.lastIndexOf("\n"));
+		
+		String parts[] = err.split(";");
+		//String part 1 is the discarded leading edge that is the closing brackets of the JSON content
+		String part_2 = parts[1];
+		
+		//split again to get rid of the closing square bracket
+		String parts2[] = part_2.split("]");
+		String part_3 = parts2[0];
+		
+		txtError.setText(part_3);
+	}
+
+	private static String readFileAsString(String fpath) throws Exception {
+		// TODO Auto-generated method stub
+		return new String(Files.readAllBytes(Paths.get(fpath)));
+	}
+
+	/*private static void process_file(String fpath) {
+		// TODO Auto-generated method stub
+		
+		JSONParser parser = new JSONParser();
+
+        try (Reader reader = new FileReader(fpath)) {
+
+            JSONObject jsonObject = (JSONObject) parser.parse(reader);
+            System.out.println(jsonObject);
+
+            String name = (String) jsonObject.get("name");
+            System.out.println(name);
+
+            long age = (Long) jsonObject.get("age");
+            System.out.println(age);
+
+            // loop array
+            JSONArray msg = (JSONArray) jsonObject.get("messages");
+            Iterator<String> iterator = msg.iterator();
+            while (iterator.hasNext()) {
+                System.out.println(iterator.next());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+	} 
+	*/
+	}
+
+
