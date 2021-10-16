@@ -1,0 +1,195 @@
+package parsingJSON;
+
+import java.awt.Color;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import javax.swing.JLabel;
+
+public class JSONTextCompare {
+	
+	//final JTextArea textAreaError = new JTextArea(); //commented out for testing output from methods that are outside the ActionEvent listeners for buttons
+
+	public JFrame frame;
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					JSONTextCompare window = new JSONTextCompare();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public JSONTextCompare() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	public void initialize() {
+		
+		frame = new JFrame();
+		frame.getContentPane().setBackground(Color.GRAY);
+		frame.setSize(699, 541);
+		frame.setLocation(300,200);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		JButton cmdCancel = new JButton("Cancel");
+		cmdCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				frame.dispose();
+			}
+		});
+		
+		final JTextArea JSONtextArea = new JTextArea();
+		JSONtextArea.setBounds(25, 20, 634, 358);
+		frame.getContentPane().add(JSONtextArea);
+		
+		cmdCancel.setBounds(476, 447, 185, 47);
+		frame.getContentPane().add(cmdCancel);
+		
+		JButton cmdClearText = new JButton("Clear Text");
+		cmdClearText.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				JSONtextArea.setText(null);
+			}
+		});
+		cmdClearText.setBounds(25, 
+				398, 185, 47);
+		frame.getContentPane().add(cmdClearText);
+		
+		final JTextArea textAreaError = new JTextArea();
+		textAreaError.setBackground(Color.ORANGE);
+		textAreaError.setEditable(false);
+		textAreaError.setBounds(486, 396, 159, 30);
+		
+		frame.getContentPane().add(textAreaError);
+		
+		JButton cmdValidate = new JButton("Valdate");
+		cmdValidate.setBounds(255, 398, 185, 47);
+		frame.getContentPane().add(cmdValidate);
+		
+		JLabel lblWarning = new JLabel("");
+		lblWarning.setOpaque(true);
+		lblWarning.setBackground(Color.ORANGE);
+		lblWarning.setBounds(25, 464, 415, 30);
+		 // create a line border with the specified color and width
+        //Border border = BorderFactory.createLineBorder(Color.BLUE, 5);
+ 
+        // set the border of this component
+        //lblWarning.setBorder(border);
+		frame.getContentPane().add(lblWarning);
+		
+		cmdValidate.addActionListener(new ActionListener() {
+			@SuppressWarnings("static-access")
+			public void actionPerformed(ActionEvent e) {
+				
+				String checkForContent = JSONtextArea.getText().trim();
+				
+				//don't do anything if there is nothing in the JSONtextArea
+				if (!(checkForContent.trim().length() > 0)) {
+					
+					return;
+					
+				}
+				
+					functionsClass ops = new functionsClass();
+					
+					String JSONcontent = JSONtextArea.getText();
+					
+					Results obj = new Results();
+					
+					ops.validate_JSON_text(JSONcontent, obj);
+					
+					String result = obj.getResult();
+					String caret = obj.getCaret();
+					String lineNum = obj.getLineNum();
+					
+					//showStatus(result);
+					
+					if(result==null) {
+						textAreaError.setText("JSON code is valid!");
+					} else {
+						textAreaError.setText(result);
+						
+						Highlighter.HighlightPainter cyanPainter;
+						cyanPainter = new DefaultHighlighter.DefaultHighlightPainter(Color.cyan);
+						
+						//the column number as per the location of the error
+						int caretPosition = Integer.parseInt(caret); //JSONtextArea.getCaretPosition();
+						//the line number as per the location of the error
+						int lineNumber = Integer.parseInt(lineNum);
+						
+						/*RXTextUtilities objLine = new RXTextUtilities();
+						
+						int offset = 0;
+						offset = objLine.gotoStartOfLine(JSONtextArea, lineNumber) + caretPosition;
+						*/
+						
+						//get the number of characters in the string up to the line in which the error is found
+						
+						int totalChars = 0;
+						int counter = 0; //used to only go to the line above where the error is located
+						
+						String[] lines = JSONcontent.split("\\r?\\n");
+						
+						for (String line : lines) {
+							
+							counter = counter + 1;
+							
+							//as long as we're above the line of the error (lineNumber variable), keep counting characters
+							if (counter < lineNumber) 
+							{
+								totalChars = totalChars + line.length();
+							} 
+							
+							//if we are at the line that contains the error, only add the caretPosition value to get the final position where the highlighting should go
+							if (counter == lineNumber)
+							{
+								totalChars = totalChars + caretPosition;
+								break;
+							}
+						}
+						
+						//put down the highlighting in the area where the JSON file is having a problem
+						try {
+							//JSONtextArea.getHighlighter().addHighlight(offset - 2, offset + 2, cyanPainter);
+							JSONtextArea.getHighlighter().addHighlight(totalChars - 2, totalChars + 2, cyanPainter);
+						} catch (BadLocationException e1) {
+							// TODO Auto-generated catch block
+							e1.getMessage();
+						}
+					}
+				}
+		});
+		
+	}
+	public void showStatus(String result) {
+		
+		System.out.println(result);
+
+		//textAreaError.setText(result);
+	}
+}
+
