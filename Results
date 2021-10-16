@@ -1,0 +1,36 @@
+package parsingJSON;
+
+public class Results {
+	
+	String part_3;
+	String caret;
+	String lineNum;
+	
+	public String getResult() {
+		
+		return part_3;
+	}
+	
+	public void setResult(String part_3) {
+		
+		this.part_3 = part_3;
+	}
+
+	public String getCaret() {
+		return caret;
+	}
+
+	public void setCaret(String caret) {
+		this.caret = caret;
+	}
+
+	public String getLineNum() {
+		return lineNum;
+	}
+
+	public void setLineNum(String lineNum) {
+		this.lineNum = lineNum;
+	}
+	
+	
+}
