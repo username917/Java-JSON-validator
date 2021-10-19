@@ -1,6 +1,8 @@
 # Java-JSON-validator
 A quaint utility that can validate a JSON file by uploading and checking a file, or analyzing the text itself and highlighting the problem line.
 
+UPDATE Oct. 19 2021: POM.XML file added to the content of the project, as it was accidentally missing before, for anyone who might've cloned it already.
+
 The MainClassJSONValidator class will load the main interface that will allow you to load a file into the interface to check if it is valid, or it has an error in it. As it will only return the location of the next error, repeat the validation process until the output says "JSON file is valid!".
 
 THe JSONTextCompare class is a subclass that allows you to copy in JSON code for the same purpose and it will highlight the offending line and output it just as if you are checking a file. Similarly, it will only highlight the next error in the text, so repeat until the output says "JSON file is valid!".
