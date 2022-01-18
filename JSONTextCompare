@@ -2,7 +2,6 @@ package parsingJSON;
 
 import java.awt.Color;
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -21,7 +20,7 @@ public class JSONTextCompare {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public void checkText() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -107,6 +106,7 @@ public class JSONTextCompare {
 				
 				String checkForContent = JSONtextArea.getText().trim();
 				
+				
 				//don't do anything if there is nothing in the JSONtextArea
 				if (!(checkForContent.trim().length() > 0)) {
 					
@@ -147,7 +147,10 @@ public class JSONTextCompare {
 						offset = objLine.gotoStartOfLine(JSONtextArea, lineNumber) + caretPosition;
 						*/
 						
+						
 						//get the number of characters in the string up to the line in which the error is found
+						
+						
 						
 						int totalChars = 0;
 						int counter = 0; //used to only go to the line above where the error is located
@@ -172,6 +175,8 @@ public class JSONTextCompare {
 							}
 						}
 						
+						
+						
 						//put down the highlighting in the area where the JSON file is having a problem
 						try {
 							//JSONtextArea.getHighlighter().addHighlight(offset - 2, offset + 2, cyanPainter);
@@ -182,6 +187,10 @@ public class JSONTextCompare {
 						}
 					}
 				}
+
+		
+
+			
 		});
 		
 	}
@@ -190,6 +199,9 @@ public class JSONTextCompare {
 		System.out.println(result);
 
 		//textAreaError.setText(result);
+		
+		
 	}
+
 }
 
